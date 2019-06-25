@@ -13,13 +13,26 @@ const projects = [
   { id: "2", title: "Novo Site", tasks: [] }
 ];
 
+/** Middlewares */
+
+function checkProjectExists(req, res, next) {
+  const { index } = req.params;
+  const project = projects.find(p => p.id === index);
+
+  if (!project) {
+    return res.status(400).json({ error: "Project not found" });
+  }
+
+  return next();
+}
+
 /** Lista todos os projetos */
 server.get(route, (req, res) => {
   return res.json(projects);
 });
 
 /** Lista um único projeto */
-server.get(`${route}:index`, (req, res) => {
+server.get(`${route}:index`, checkProjectExists, (req, res) => {
   const { index } = req.params;
 
   return res.json(projects[index]);
@@ -36,7 +49,7 @@ server.post(route, (req, res) => {
 });
 
 /** Cadastra Tarefa */
-server.post(`${route}:index/tasks`, (req, res) => {
+server.post(`${route}:index/tasks`, checkProjectExists, (req, res) => {
   const { index } = req.params;
   const { title } = req.body;
 
@@ -48,7 +61,7 @@ server.post(`${route}:index/tasks`, (req, res) => {
 });
 
 /** Edita nome do projeto */
-server.put(`${route}:index`, (req, res) => {
+server.put(`${route}:index`, checkProjectExists, (req, res) => {
   const { index } = req.params;
   const { title } = req.body;
 
@@ -58,7 +71,7 @@ server.put(`${route}:index`, (req, res) => {
 });
 
 /** Deleta projeto */
-server.delete(`${route}:index`, (req, res) => {
+server.delete(`${route}:index`, checkProjectExists, (req, res) => {
   const { index } = req.params;
 
   projects.splice(index, 1);
