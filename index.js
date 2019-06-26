@@ -26,6 +26,18 @@ function checkProjectExists(req, res, next) {
   return next();
 }
 
+let numberOfRequests = 0;
+
+function logRequests(req, res, next) {
+  numberOfRequests++;
+
+  console.log(`Número de requisições: ${numberOfRequests}`);
+
+  return next();
+}
+
+server.use(logRequests);
+
 /** Lista todos os projetos */
 server.get(route, (req, res) => {
   return res.json(projects);
@@ -49,7 +61,7 @@ server.post(route, (req, res) => {
 });
 
 /** Cadastra Tarefa */
-server.post(`${route}:index/tasks`, checkProjectExists, (req, res) => {
+server.post(`${route}:index/tasks`, (req, res) => {
   const { index } = req.params;
   const { title } = req.body;
 
